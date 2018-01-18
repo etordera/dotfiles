@@ -46,6 +46,11 @@ nnoremap L $
 " Sensible yank to end of line
 nnoremap Y y$
 
+" Swap jump to markers.
+" Easier to type ' now jumps to line and column.
+nnoremap ' `
+nnoremap ` '
+
 " Plugins ---------------------------------
 " Plugin management with vim-plug (https://github.com/junegunn/vim-plug)
 call plug#begin('~/.vim/plugged')
