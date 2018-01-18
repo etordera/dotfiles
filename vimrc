@@ -43,6 +43,9 @@ inoremap jk <esc>
 nnoremap H 0
 nnoremap L $
 
+" Sensible yank to end of line
+nnoremap Y y$
+
 " Plugins ---------------------------------
 " Plugin management with vim-plug (https://github.com/junegunn/vim-plug)
 call plug#begin('~/.vim/plugged')
