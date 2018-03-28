@@ -41,7 +41,9 @@ inoremap jk <esc>
 
 " Quicker begin and end of line
 nnoremap H 0
+vnoremap H 0
 nnoremap L $
+vnoremap L $
 
 " Sensible yank to end of line
 nnoremap Y y$
