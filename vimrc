@@ -11,6 +11,14 @@ set shiftwidth=4
 set expandtab
 set backspace=indent,eol,start
 
+" Indentation per file type
+autocmd Filetype html setlocal ts=2 sw=2
+autocmd Filetype scss setlocal ts=2 sw=2
+autocmd Filetype ruby setlocal ts=2 sw=2
+autocmd Filetype eruby setlocal ts=2 sw=2
+autocmd Filetype xml setlocal ts=2 sw=2
+autocmd Filetype yaml setlocal ts=2 sw=2
+
 " Line numbers
 set number
 set relativenumber
@@ -22,6 +30,7 @@ set clipboard=unnamedplus
 set nowrap
 set splitright
 set splitbelow
+set mouse=a
 
 " Key bindings ----------------------------
 " Ease things for spanish keyboard
@@ -58,7 +67,18 @@ nnoremap ` '
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'alvan/vim-closetag'
 Plug 'scrooloose/nerdtree'
 Plug 'easymotion/vim-easymotion'
+Plug 'vim-scripts/L9'
+Plug 'vim-scripts/FuzzyFinder'
 
 call plug#end()
+
+" vim-closetag settings
+let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
+
+" FuzzyFinder settings
+set wildignore+=bin/*,tmp/*,*.class,*.zip,*.jpg,*.png
+nnoremap <leader>o :FufFile **/<cr>
