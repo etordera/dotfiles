@@ -12,12 +12,7 @@ set expandtab
 set backspace=indent,eol,start
 
 " Indentation per file type
-autocmd Filetype html setlocal ts=2 sw=2
-autocmd Filetype scss setlocal ts=2 sw=2
-autocmd Filetype ruby setlocal ts=2 sw=2
-autocmd Filetype eruby setlocal ts=2 sw=2
-autocmd Filetype xml setlocal ts=2 sw=2
-autocmd Filetype yaml setlocal ts=2 sw=2
+autocmd Filetype html,scss,ruby,eruby,xml,yaml setlocal ts=2 sw=2
 
 " Line numbers
 set number
@@ -37,6 +32,9 @@ set mouse=a
 noremap ñ /
 noremap Ñ ?
 let mapleader = " "
+
+" Open previous file
+nnoremap <leader>p <C-^>
 
 " Add blank lines
 nnoremap <leader><cr> o<esc>
@@ -68,17 +66,21 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-commentary'
 Plug 'alvan/vim-closetag'
 Plug 'scrooloose/nerdtree'
 Plug 'easymotion/vim-easymotion'
-Plug 'vim-scripts/L9'
-Plug 'vim-scripts/FuzzyFinder'
+Plug 'ctrlpvim/ctrlp.vim'
 
 call plug#end()
+
+" NERDTree settings
+nnoremap <leader>n :NERDTreeToggle<cr>
 
 " vim-closetag settings
 let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
 
-" FuzzyFinder settings
-set wildignore+=bin/*,tmp/*,*.class,*.zip,*.jpg,*.png
-nnoremap <leader>o :FufFile **/<cr>
+" Ctrl-P settings
+set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
+let g:ctrlp_map = '<leader>o'
