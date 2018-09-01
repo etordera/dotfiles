@@ -11,21 +11,45 @@ set shiftwidth=4
 set expandtab
 set backspace=indent,eol,start
 
-" Indentation per file type
-autocmd Filetype html,scss,ruby,eruby,xml,yaml setlocal ts=2 sw=2
-
 " Line numbers
 set number
 set relativenumber
+
+" Status line always visible
+set laststatus=2
+
+" Auto commands
+augroup etordera
+    autocmd!
+
+    " Custom parameters per file type
+    autocmd Filetype html,scss,eruby,xml,yaml setlocal tabstop=2 shiftwidth=2
+
+    " Disable relative numbers for ruby: workaround for slowdown bug
+    autocmd Filetype ruby setlocal tabstop=2 shiftwidth=2 norelativenumber
+augroup END
 
 " Share default register with system clipboard
 set clipboard=unnamedplus
 
 " Miscelaneous
-set nowrap
-set splitright
-set splitbelow
-set mouse=a
+set nowrap             " don't wrap long lines
+set splitright         " split horizontal to right
+set splitbelow         " split vertical below
+set mouse=a            " enable mouse
+set scrolloff=4        " keep 4 lines off the edges when scrolling
+set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
+set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
+
+" Keep swap, backup and undo files out of workspaces
+let swapdir = $HOME.'/.vim/swapfiles'
+if !isdirectory(swapdir)
+    call mkdir(swapdir, "p")
+endif
+let swapdir_spec = swapdir.'//'
+let &directory = swapdir_spec
+let &backupdir = swapdir_spec
+let &undodir = swapdir_spec
 
 " Key bindings ----------------------------
 " Ease things for spanish keyboard
@@ -35,6 +59,12 @@ let mapleader = " "
 
 " Open previous file
 nnoremap <leader>p <C-^>
+
+" Quick save
+nnoremap <leader>w :w<cr>
+
+" Write with sudo
+cnoremap w!! w !sudo tee % > /dev/null
 
 " Add blank lines
 nnoremap <leader><cr> o<esc>
@@ -55,7 +85,7 @@ vnoremap L $
 " Sensible yank to end of line
 nnoremap Y y$
 
-" Swap jump to markers.
+" Swap 'jump to' markers.
 " Easier to type ' now jumps to line and column.
 nnoremap ' `
 nnoremap ` '
@@ -64,19 +94,41 @@ nnoremap ` '
 " Plugin management with vim-plug (https://github.com/junegunn/vim-plug)
 call plug#begin('~/.vim/plugged')
 
+" Add/change surrounding elements
 Plug 'tpope/vim-surround'
+" Allow dot command for plugins
+Plug 'tpope/vim-repeat'
+" Git integration
 Plug 'tpope/vim-fugitive'
+" Rails utilities
 Plug 'tpope/vim-rails'
+" Add/remove comments
 Plug 'tpope/vim-commentary'
+" Automatically add 'end'
+Plug 'tpope/vim-endwise'
+" Automatically close html tags
 Plug 'alvan/vim-closetag'
+" Automatically pair brackets, parentheses, quotes
+Plug 'jiangmiao/auto-pairs'
+" File tree sidebar
 Plug 'scrooloose/nerdtree'
+" Quick movements
 Plug 'easymotion/vim-easymotion'
+" Fuzzy file searches
 Plug 'ctrlpvim/ctrlp.vim'
+" Check syntax inside vim
+Plug 'vim-syntastic/syntastic'
+
+" Switch colorscheme with F8
+Plug 'felixhummel/setcolors.vim'
+" Colorschemes pack
+Plug 'flazz/vim-colorschemes'
 
 call plug#end()
 
 " NERDTree settings
 nnoremap <leader>n :NERDTreeToggle<cr>
+let NERDTreeAutoDeleteBuffer = 1
 
 " vim-closetag settings
 let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
