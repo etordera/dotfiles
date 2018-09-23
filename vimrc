@@ -13,24 +13,28 @@ set backspace=indent,eol,start
 
 " Line numbers
 set number
-set relativenumber
+" Disabled as a workaround for ruby/haml slowdown bug
+" set relativenumber
 
-" Status line always visible
+" Custom status line
 set laststatus=2
+set statusline=%f%<\ %q%h%w%m%r
+set statusline+=%=
+set statusline+=%l:%c
+set statusline+=\ 
+set statusline+=%#PmenuSel#
+set statusline+=%{FugitiveStatusline()}
+set statusline+=%#LineNr#
 
 " Auto commands
 augroup etordera
     autocmd!
-
     " Custom parameters per file type
-    autocmd Filetype html,scss,eruby,xml,yaml setlocal tabstop=2 shiftwidth=2
-
-    " Disable relative numbers for ruby: workaround for slowdown bug
-    autocmd Filetype ruby setlocal tabstop=2 shiftwidth=2 norelativenumber
+    autocmd Filetype html,scss,eruby,xml,yaml,ruby,haml setlocal tabstop=2 shiftwidth=2
 augroup END
 
 " Share default register with system clipboard
-set clipboard=unnamedplus
+set clipboard=unnamed
 
 " Miscelaneous
 set nowrap             " don't wrap long lines
@@ -63,6 +67,9 @@ nnoremap <leader>p <C-^>
 " Quick save
 nnoremap <leader>w :w<cr>
 
+" Change ruby hashrockets to new format on current line
+nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
+
 " Write with sudo
 cnoremap w!! w !sudo tee % > /dev/null
 
@@ -89,6 +96,12 @@ nnoremap Y y$
 " Easier to type ' now jumps to line and column.
 nnoremap ' `
 nnoremap ` '
+
+" Quicker change to other windows
+nnoremap <C-h> <C-w><C-h>
+nnoremap <C-j> <C-w><C-j>
+nnoremap <C-k> <C-w><C-k>
+nnoremap <C-l> <C-w><C-l>
 
 " Plugins ---------------------------------
 " Plugin management with vim-plug (https://github.com/junegunn/vim-plug)
@@ -129,6 +142,7 @@ call plug#end()
 " NERDTree settings
 nnoremap <leader>n :NERDTreeToggle<cr>
 let NERDTreeAutoDeleteBuffer = 1
+let NERDTreeMouseMode = 2
 
 " vim-closetag settings
 let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
@@ -136,3 +150,4 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
+nnoremap <leader>r :CtrlPMRU<cr>
