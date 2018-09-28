@@ -44,6 +44,7 @@ set mouse=a            " enable mouse
 set scrolloff=4        " keep 4 lines off the edges when scrolling
 set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
 set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
+set diffopt=filler,vertical " open diff windows with vertical split
 
 " Keep swap, backup and undo files out of workspaces
 let swapdir = $HOME.'/.vim/swapfiles'
@@ -66,6 +67,9 @@ nnoremap <leader>p <C-^>
 
 " Quick save
 nnoremap <leader>w :w<cr>
+
+" Quick quit
+nnoremap <leader>q :qa<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
@@ -132,11 +136,6 @@ Plug 'ctrlpvim/ctrlp.vim'
 " Check syntax inside vim
 Plug 'vim-syntastic/syntastic'
 
-" Switch colorscheme with F8
-Plug 'felixhummel/setcolors.vim'
-" Colorschemes pack
-Plug 'flazz/vim-colorschemes'
-
 call plug#end()
 
 " NERDTree settings
@@ -150,4 +149,4 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
-nnoremap <leader>r :CtrlPMRU<cr>
+nnoremap <leader>r :CtrlPMRUFiles<cr>
