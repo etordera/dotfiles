@@ -34,7 +34,11 @@ augroup etordera
 augroup END
 
 " Share default register with system clipboard
-set clipboard=unnamed
+if has('mac')
+    set clipboard=unnamed
+else
+    set clipboard=unnamedplus
+endif
 
 " Miscelaneous
 set nowrap             " don't wrap long lines
@@ -135,6 +139,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'ctrlpvim/ctrlp.vim'
 " Check syntax inside vim
 Plug 'vim-syntastic/syntastic'
+" Running rspec
+Plug 'thoughtbot/vim-rspec'
 
 call plug#end()
 
@@ -150,3 +156,10 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
 nnoremap <leader>r :CtrlPMRUFiles<cr>
+
+" vim-rspec settings
+let g:rspec_command = "!bundle exec rspec --format documentation {spec}"
+nnoremap <Leader>sf :call RunCurrentSpecFile()<CR>
+nnoremap <Leader>ss :call RunNearestSpec()<CR>
+nnoremap <Leader>sl :call RunLastSpec()<CR>
+nnoremap <Leader>sa :call RunAllSpecs()<CR>
