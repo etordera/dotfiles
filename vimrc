@@ -78,6 +78,13 @@ nnoremap <leader>q :qa<cr>
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
 
+" Create tags file: only project files
+nnoremap <leader>tp :!ctags -R --languages=ruby --exclude=.git --exclude=log .<cr>
+" Create tags file: project files and bundled gems
+nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle show --paths)<cr>
+" Jump to tag, open select window for multiple matches
+nnoremap <leader>tt g<C-]>
+
 " Write with sudo
 cnoremap w!! w !sudo tee % > /dev/null
 
