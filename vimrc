@@ -60,6 +60,12 @@ let &directory = swapdir_spec
 let &backupdir = swapdir_spec
 let &undodir = swapdir_spec
 
+" Use the silver searcher for grepping
+if executable('ag')
+    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags\ \"$*\"
+    command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
+endif
+
 " Key bindings ----------------------------
 " Ease things for spanish keyboard
 noremap ñ /
@@ -84,6 +90,7 @@ nnoremap <leader>tp :!ctags -R --languages=ruby --exclude=.git --exclude=log .<c
 nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle show --paths)<cr>
 " Jump to tag, open select window for multiple matches
 nnoremap <leader>tt g<C-]>
+vnoremap <leader>tt g<C-]>
 
 " Write with sudo
 cnoremap w!! w !sudo tee % > /dev/null
