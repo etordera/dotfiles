@@ -60,17 +60,19 @@ let &directory = swapdir_spec
 let &backupdir = swapdir_spec
 let &undodir = swapdir_spec
 
-" Use the silver searcher for grepping
-if executable('ag')
-    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags\ \"$*\"
-    command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
-endif
-
 " Key bindings ----------------------------
 " Ease things for spanish keyboard
 noremap ñ /
 noremap Ñ ?
 let mapleader = " "
+
+if executable('ag')
+    " Use the silver searcher for grepping
+    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags\ \"$*\"
+    command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
+    " Find references to symbol under cursor
+    nnoremap <leader>f :AG <C-r><C-w><cr>
+endif
 
 " Open previous file
 nnoremap <leader>p <C-^>
@@ -81,16 +83,21 @@ nnoremap <leader>w :w<cr>
 " Quick quit
 nnoremap <leader>q :qa<cr>
 
+" Close quickfix list
+nnoremap <leader>c :cclose<cr>
+
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
 
 " Create tags file: only project files
 nnoremap <leader>tp :!ctags -R --languages=ruby --exclude=.git --exclude=log .<cr>
 " Create tags file: project files and bundled gems
-nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle show --paths)<cr>
+nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle show --paths \| grep ^/)<cr>
 " Jump to tag, open select window for multiple matches
 nnoremap <leader>tt g<C-]>
 vnoremap <leader>tt g<C-]>
+" Jump to tag, include ending ? or !
+nnoremap <leader>tf viw<Right>g<C-]>
 
 " Write with sudo
 cnoremap w!! w !sudo tee % > /dev/null
