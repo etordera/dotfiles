@@ -30,7 +30,7 @@ set statusline+=%#LineNr#
 augroup etordera
     autocmd!
     " Custom parameters per file type
-    autocmd Filetype html,scss,eruby,xml,yaml,ruby,haml setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml setlocal tabstop=2 shiftwidth=2
 augroup END
 
 " Share default register with system clipboard
@@ -176,6 +176,7 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
+let g:ctrlp_working_path_mode = 'a'
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 
 " vim-rspec settings
