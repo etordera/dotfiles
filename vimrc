@@ -89,6 +89,9 @@ nnoremap <leader>c :cclose<cr>
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
 
+" Toggle highlighting search matches
+nnoremap <leader>l :set hlsearch!<cr>
+
 " Create tags file: only project files
 nnoremap <leader>tp :!ctags -R --languages=ruby --exclude=.git --exclude=log .<cr>
 " Create tags file: project files and bundled gems
@@ -162,6 +165,12 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-syntastic/syntastic'
 " Running rspec
 Plug 'thoughtbot/vim-rspec'
+" Custom text-objects
+Plug 'kana/vim-textobj-user'
+" Ruby text-objects: r(uby block), f(unction), c(lass), n(ame)
+Plug 'tek/vim-textobj-ruby'
+" ERB text-objects: E(RB)
+Plug 'whatyouhide/vim-textobj-erb'
 
 call plug#end()
 
