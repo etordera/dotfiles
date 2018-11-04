@@ -1,4 +1,6 @@
-My personal .vimrc configuration for Vim.
+My personal configuration files:
+.vimrc configuration for Vim.
+.tmux.conf configuration for tmux.
 
 ### Installation
 
@@ -13,3 +15,11 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 ```
 curl -fLo ~/.vimrc https://raw.githubusercontent.com/etordera/vimrc/master/vimrc
 ```
+
+[Download .tmux.conf](https://raw.githubusercontent.com/etordera/vimrc/master/tmux.conf) and put it in your home directory.
+
+```
+curl -fLo ~/.tmux.conf https://raw.githubusercontent.com/etordera/vimrc/master/tmux.conf
+```
+
+
