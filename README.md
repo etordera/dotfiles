@@ -1,6 +1,7 @@
 My personal configuration files:
-.vimrc configuration for Vim.
-.tmux.conf configuration for tmux.
+
+* .vimrc configuration for Vim.
+* .tmux.conf configuration for tmux.
 
 ### Installation
 
