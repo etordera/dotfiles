@@ -20,7 +20,9 @@ set number
 set laststatus=2
 set statusline=%f%<\ %q%h%w%m%r
 set statusline+=%=
-set statusline+=%l:%c
+set statusline+=[%b\ 0x%B]
+set statusline+=\ 
+set statusline+=%l/%L:%c
 set statusline+=\ 
 set statusline+=%#PmenuSel#
 set statusline+=%{FugitiveStatusline()}
@@ -45,6 +47,7 @@ set nowrap             " don't wrap long lines
 set splitright         " split horizontal to right
 set splitbelow         " split vertical below
 set mouse=a            " enable mouse
+set ttymouse=xterm2    " make mouse play nice with tmux
 set scrolloff=4        " keep 4 lines off the edges when scrolling
 set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
 set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
@@ -60,6 +63,9 @@ let &directory = swapdir_spec
 let &backupdir = swapdir_spec
 let &undodir = swapdir_spec
 
+" Load matchit (match do ... end)
+runtime macros/matchit.vim
+
 " Key bindings ----------------------------
 " Ease things for spanish keyboard
 noremap ñ /
@@ -68,7 +74,7 @@ let mapleader = " "
 
 if executable('ag')
     " Use the silver searcher for grepping
-    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags\ \"$*\"
+    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags
     command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
     " Find references to symbol under cursor
     nnoremap <leader>f :AG <C-r><C-w><cr>
@@ -171,6 +177,10 @@ Plug 'kana/vim-textobj-user'
 Plug 'tek/vim-textobj-ruby'
 " ERB text-objects: E(RB)
 Plug 'whatyouhide/vim-textobj-erb'
+" Open file:line
+Plug 'bogado/file-line'
+" Snippets
+Plug 'SirVer/ultisnips'
 
 call plug#end()
 
@@ -194,3 +204,6 @@ nnoremap <Leader>sf :call RunCurrentSpecFile()<CR>
 nnoremap <Leader>ss :call RunNearestSpec()<CR>
 nnoremap <Leader>sl :call RunLastSpec()<CR>
 nnoremap <Leader>sa :call RunAllSpecs()<CR>
+
+" UltiSnips settings
+let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
