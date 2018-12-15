@@ -81,6 +81,9 @@ if executable('ag')
     nnoremap <leader>f :AG <C-r><C-w><cr>
 endif
 
+" Do a search and replace on quickfix list locations
+nnoremap <leader>d :cdo s//g \| update<C-Left><C-Left><C-Left><Right><Right>
+
 " Open previous file
 nnoremap <leader>p <C-^>
 
