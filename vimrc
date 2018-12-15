@@ -20,9 +20,10 @@ set number
 set laststatus=2
 set statusline=%f%<\ %q%h%w%m%r
 set statusline+=%=
-set statusline+=[%b\ 0x%B]
-set statusline+=\ 
-set statusline+=%l/%L:%c
+"set statusline+=[%b\ 0x%B]
+"set statusline+=\ 
+set statusline+=%l/%L
+"set statusline+=:%c
 set statusline+=\ 
 set statusline+=%#PmenuSel#
 set statusline+=%{FugitiveStatusline()}
@@ -171,6 +172,8 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-syntastic/syntastic'
 " Running rspec
 Plug 'thoughtbot/vim-rspec'
+" Run rspecs in tmux pane, read errors to quickfix list
+Plug 'tpope/vim-dispatch'
 " Custom text-objects
 Plug 'kana/vim-textobj-user'
 " Ruby text-objects: r(uby block), f(unction), c(lass), n(ame)
@@ -199,11 +202,28 @@ let g:ctrlp_working_path_mode = 'a'
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 
 " vim-rspec settings
-let g:rspec_command = "!bundle exec rspec --format documentation {spec}"
-nnoremap <Leader>sf :call RunCurrentSpecFile()<CR>
-nnoremap <Leader>ss :call RunNearestSpec()<CR>
-nnoremap <Leader>sl :call RunLastSpec()<CR>
-nnoremap <Leader>sa :call RunAllSpecs()<CR>
+function! RotateRSpecCommand()
+    let g:rspec_command = g:rspec_commands[g:rspec_command_next]." --format documentation {spec}"
+    let g:rspec_command_next = g:rspec_command_next + 1
+    if g:rspec_command_next >= len(g:rspec_commands)
+        let g:rspec_command_next = 0
+    endif
+endfunction
+
+function! RSpecCommandInfo()
+    echo "RSpec command: ".g:rspec_command
+endfunction
+
+let g:rspec_commands = ['!rspec', '!bundle exec rspec', 'Dispatch -compiler=rspec bundle exec rspec']
+let g:rspec_command_next = 1
+call RotateRSpecCommand()
+
+nnoremap <Leader>sc :call RotateRSpecCommand()<cr>:call RSpecCommandInfo()<cr>
+nnoremap <Leader>si :call RSpecCommandInfo()<cr>
+nnoremap <Leader>sf :call RunCurrentSpecFile()<cr>
+nnoremap <Leader>ss :call RunNearestSpec()<cr>
+nnoremap <Leader>sl :call RunLastSpec()<cr>
+nnoremap <Leader>sa :call RunAllSpecs()<cr>
 
 " UltiSnips settings
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
