@@ -93,8 +93,8 @@ nnoremap <leader>w :w<cr>
 " Quick quit
 nnoremap <leader>q :qa<cr>
 
-" Close quickfix list
-nnoremap <leader>c :cclose<cr>
+" Close quickfix/local list
+nnoremap <leader>c :cclose<cr>:lclose<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
@@ -218,7 +218,7 @@ function! RSpecCommandInfo()
 endfunction
 
 let g:rspec_commands = ['!rspec', '!bundle exec rspec', 'Dispatch -compiler=rspec bundle exec rspec']
-let g:rspec_command_next = 1
+let g:rspec_command_next = 2
 call RotateRSpecCommand()
 
 nnoremap <Leader>sc :call RotateRSpecCommand()<cr>:call RSpecCommandInfo()<cr>
@@ -230,3 +230,13 @@ nnoremap <Leader>sa :call RunAllSpecs()<cr>
 
 " UltiSnips settings
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
+
+" Syntastic settings
+if executable('rubocop')
+    function! SaveAndRubocop()
+        let g:syntastic_ruby_checkers = ['rubocop']
+        write
+        unlet g:syntastic_ruby_checkers
+    endfunction
+    nnoremap <Leader>b :call SaveAndRubocop()<cr>
+endif
