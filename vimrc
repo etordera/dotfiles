@@ -1,20 +1,19 @@
-" Options ---------------------------------
-" Search options
-set ignorecase
-set smartcase
-set incsearch
+" ------------------------------------------------------------------------------
+" Configuration / options
+" ------------------------------------------------------------------------------
+
+" Searching
+set ignorecase    " Searches are case-insensitive
+set smartcase     " Search case-sensitively for terms with uppercase letters
+set incsearch     " Show search hits while typing
+set nohlsearch    " Do not highlight search hits
 
 " Indentation and tabs
-set autoindent
-set tabstop=4
-set shiftwidth=4
-set expandtab
-set backspace=indent,eol,start
-
-" Line numbers
-set number
-" Disabled as a workaround for ruby/haml slowdown bug
-" set relativenumber
+set autoindent       " Copy indent from current line when starting a new line
+set tabstop=4        " A <Tab> is four spaces
+set shiftwidth=4     " Indentation shift is 4 spaces
+set expandtab        " Use spaces instead of tabs
+set backspace=indent,eol,start      " Sensible backspace behaviour
 
 " Custom status line
 set laststatus=2
@@ -23,7 +22,7 @@ set statusline+=%=
 "set statusline+=[%b\ 0x%B]
 "set statusline+=\ 
 set statusline+=%l/%L
-"set statusline+=:%c
+set statusline+=:%c
 set statusline+=\ 
 set statusline+=%#PmenuSel#
 set statusline+=%{FugitiveStatusline()}
@@ -32,8 +31,10 @@ set statusline+=%#LineNr#
 " Auto commands
 augroup etordera
     autocmd!
-    " Custom parameters per file type
-    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml setlocal tabstop=2 shiftwidth=2
+    " Tab sizes per file type
+    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript setlocal tabstop=2 shiftwidth=2
+    " Keyword chars per file type
+    autocmd Filetype ruby setlocal iskeyword=@,48-57,_,?,!
 augroup END
 
 " Share default register with system clipboard
@@ -44,42 +45,66 @@ else
 endif
 
 " Miscelaneous
-set nowrap             " don't wrap long lines
-set splitright         " split horizontal to right
-set splitbelow         " split vertical below
-set mouse=a            " enable mouse
-set ttymouse=xterm2    " make mouse play nice with tmux
-set scrolloff=4        " keep 4 lines off the edges when scrolling
+set number             " Line numbers
+set background=light   " Use colors for light background
+set nowrap             " Don't wrap long lines
+set splitright         " Split horizontal to right
+set splitbelow         " Split vertical below
+set mouse=a            " Enable mouse
+if !has('nvim')
+    set ttymouse=xterm2    " Make mouse play nice with tmux
+endif
+set scrolloff=4        " Keep 4 lines off the edges when scrolling
 set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
 set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
-set diffopt=filler,vertical " open diff windows with vertical split
+set diffopt=filler,vertical " Open diff windows with vertical split
 
 " Keep swap, backup and undo files out of workspaces
-let swapdir = $HOME.'/.vim/swapfiles'
-if !isdirectory(swapdir)
-    call mkdir(swapdir, "p")
+if !has('nvim')
+    let swapdir = $HOME.'/.vim/swapfiles'
+    if !isdirectory(swapdir)
+        call mkdir(swapdir, "p")
+    endif
+    let swapdir_spec = swapdir.'//'
+    let &directory = swapdir_spec
+    let &backupdir = swapdir_spec
+    let &undodir = swapdir_spec
 endif
-let swapdir_spec = swapdir.'//'
-let &directory = swapdir_spec
-let &backupdir = swapdir_spec
-let &undodir = swapdir_spec
 
 " Load matchit (match do ... end)
 runtime macros/matchit.vim
 
-" Key bindings ----------------------------
+
+" ------------------------------------------------------------------------------
+" Mappings and custom commands
+" ------------------------------------------------------------------------------
+
 " Ease things for spanish keyboard
 noremap ñ /
 noremap Ñ ?
 let mapleader = " "
 
+" Use the silver searcher for grepping
 if executable('ag')
-    " Use the silver searcher for grepping
     set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags
     command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
     " Find references to symbol under cursor
     nnoremap <leader>f :AG <C-r><C-w><cr>
 endif
+
+" Settings needed for keycodes to work in terminal vim
+set <S-F3>=[1;2R
+set <S-F4>=[1;2S
+
+" Move to next/previous quickfix location
+nnoremap <F3> :cnext<cr>
+nnoremap <S-F3> :cprevious<cr>
+nnoremap <F4> :cnfile<cr>
+nnoremap <S-F4> :cpfile<cr>
+
+" Move to next/previous change location
+nnoremap <A-o> g;
+nnoremap <A-i> g,
 
 " Do a search and replace on quickfix list locations
 nnoremap <leader>d :cdo s//g \| update<C-Left><C-Left><C-Left><Right><Right>
@@ -97,7 +122,8 @@ nnoremap <leader>q :qa<cr>
 nnoremap <leader>c :cclose<cr>:lclose<cr>
 
 " Change ruby hashrockets to new format on current line
-nnoremap <leader>h :s/:\([^=,'"]*\) =>/\1:/g<cr>
+nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
+vnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 
 " Toggle highlighting search matches
 nnoremap <leader>l :set hlsearch!<cr>
@@ -109,14 +135,9 @@ nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $
 " Jump to tag, open select window for multiple matches
 nnoremap <leader>tt g<C-]>
 vnoremap <leader>tt g<C-]>
-" Jump to tag, include ending ? or !
-nnoremap <leader>tf viw<Right>g<C-]>
 
 " Write with sudo
 cnoremap w!! w !sudo tee % > /dev/null
-
-" Add blank lines
-nnoremap <leader><cr> o<esc>
 
 " Quickly edit and save .vimrc
 nnoremap <leader>ev :vsp $MYVIMRC<cr>
@@ -124,6 +145,9 @@ nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>:q<cr>
 
 " Exit insert mode without <esc> stretch
 inoremap jk <esc>
+if has('nvim')
+    tnoremap jk <C-\><C-n>
+endif
 
 " Quicker begin and end of line
 nnoremap H 0
@@ -145,9 +169,54 @@ nnoremap <C-j> <C-w><C-j>
 nnoremap <C-k> <C-w><C-k>
 nnoremap <C-l> <C-w><C-l>
 
-" Plugins ---------------------------------
-" Plugin management with vim-plug (https://github.com/junegunn/vim-plug)
-call plug#begin('~/.vim/plugged')
+" Resizing windows
+nnoremap <A-l> :vertical resize +2<cr>
+nnoremap <A-h> :vertical resize -2<cr>
+nnoremap <A-j> :resize -1<cr>
+nnoremap <A-k> :resize +1<cr>
+
+" Close window
+nnoremap <leader>x <C-w>c
+
+" Keep only current window
+nnoremap <leader>z <C-w>o
+
+" XML pretty formatting
+if executable('xmllint')
+    command! XXmlLint execute '%!xmllint --format -'
+endif
+
+" Hex dump
+if executable('xxd')
+    command! XHexDump execute '%!xxd'
+endif
+
+" Quick open terminal in vertical split
+if has('nvim')
+    command! T execute 'set shell=/bin/bash\ --login' | execute 'vsplit' | execute 'terminal' | execute 'set shell=/bin/bash'
+endif
+
+
+" ------------------------------------------------------------------------------
+" Plugins
+" ------------------------------------------------------------------------------
+
+" Keep vim and neovim plugins in separate paths
+let plug_vim_path = '~/.vim/autoload/plug.vim'
+let plugins_path = '~/.vim/plugged'
+if has('nvim')
+    let plug_vim_path = '~/.local/share/nvim/site/autoload/plug.vim'
+    let plugins_path = '~/.local/share/nvim/plugged'
+endif
+
+" Automatically install vim-plug (https://github.com/junegunn/vim-plug)
+if empty(glob(plug_vim_path))
+  echo "Downloading vim-plug..."
+  execute "!curl -fLo ".plug_vim_path." --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin(plugins_path)
 
 " Add/change surrounding elements
 Plug 'tpope/vim-surround'
@@ -187,22 +256,42 @@ Plug 'whatyouhide/vim-textobj-erb'
 Plug 'bogado/file-line'
 " Snippets
 Plug 'SirVer/ultisnips'
+" Show indentation lines
+Plug 'yggdroot/indentline'
+" Manage docker containers
+Plug 'etordera/vim-docker-tools'
+" Autocomplete
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    " Autocomplete source: syntax highlighting
+    Plug 'Shougo/neco-syntax'
+    " Autocomplete source: ruby
+    Plug 'etordera/deoplete-ruby'
+    " Autocomplete source: rails
+    Plug 'etordera/deoplete-rails'
+else
+    Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+endif
 
 call plug#end()
 
 " NERDTree settings
 nnoremap <leader>n :NERDTreeToggle<cr>
+nnoremap <leader>i :NERDTreeFind<cr>
 let NERDTreeAutoDeleteBuffer = 1
 let NERDTreeMouseMode = 2
 
 " vim-closetag settings
-let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php'
+let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp'
 
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
 let g:ctrlp_working_path_mode = 'a'
+" Add S ruby-type for universal-ctags singleton methods
+let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmS' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
+nnoremap <leader>m :CtrlPBufTag<cr>
 
 " vim-rspec settings
 function! RotateRSpecCommand()
@@ -217,8 +306,9 @@ function! RSpecCommandInfo()
     echo "RSpec command: ".g:rspec_command
 endfunction
 
-let g:rspec_commands = ['!rspec', '!bundle exec rspec', 'Dispatch -compiler=rspec bundle exec rspec']
-let g:rspec_command_next = 2
+"let g:rspec_commands = ['!rspec', '!bundle exec rspec', 'Dispatch -compiler=rspec bundle exec rspec', 'vsplit | terminal bundle exec rspec', 'terminal bundle exec rspec']
+let g:rspec_commands = ['Dispatch -compiler=rspec bundle exec rspec', 'vsplit | terminal bundle exec rspec']
+let g:rspec_command_next = 0
 call RotateRSpecCommand()
 
 nnoremap <Leader>sc :call RotateRSpecCommand()<cr>:call RSpecCommandInfo()<cr>
@@ -230,6 +320,7 @@ nnoremap <Leader>sa :call RunAllSpecs()<cr>
 
 " UltiSnips settings
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
+let g:UltiSnipsExpandTrigger = '<C-e>'
 
 " Syntastic settings
 if executable('rubocop')
@@ -240,3 +331,19 @@ if executable('rubocop')
     endfunction
     nnoremap <Leader>b :call SaveAndRubocop()<cr>
 endif
+
+" Deoplete settings
+let g:deoplete#enable_at_startup = 1
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+
+" Indentline settings
+let g:indentLine_enabled = 0
+nnoremap <Leader>y :IndentLinesToggle<cr>
+
+" Docker Tools settings
+let g:dockertools_size = 10
+nnoremap <Leader>k :DockerToolsToggle<cr>
+
+" EasyMotion settings
+let g:EasyMotion_keys = 'asdfghjklqwertyuiopzxcvbnmñ'
