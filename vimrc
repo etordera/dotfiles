@@ -55,6 +55,7 @@ if !has('nvim')
     set ttymouse=xterm2    " Make mouse play nice with tmux
 endif
 set scrolloff=4        " Keep 4 lines off the edges when scrolling
+set sidescrolloff=8    " Keep 8 columns off the edges when scrolling horizontally
 set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
 set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
 set diffopt=filler,vertical " Open diff windows with vertical split
@@ -288,8 +289,8 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp'
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
 let g:ctrlp_working_path_mode = 'a'
-" Add S ruby-type for universal-ctags singleton methods
-let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmS' }
+" Add kinds for universal-ctags: S for singleton methods, s for scopes
+let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
 
