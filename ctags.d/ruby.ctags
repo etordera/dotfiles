@@ -1,0 +1,2 @@
+--kinddef-ruby=s,scope,scopes
+--regex-ruby=/^[ \t]*scope[ \t]*:([a-zA-Z0-9_]+)/\1/s/
