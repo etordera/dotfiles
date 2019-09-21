@@ -187,6 +187,11 @@ if executable('xmllint')
     command! XXmlLint execute '%!xmllint --format -'
 endif
 
+" JSON pretty formatting
+if executable('python')
+    command! XJsonFmt execute '%!python -m json.tool'
+endif
+
 " Hex dump
 if executable('xxd')
     command! XHexDump execute '%!xxd'
