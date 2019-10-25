@@ -108,7 +108,7 @@ nnoremap <A-o> g;
 nnoremap <A-i> g,
 
 " Do a search and replace on quickfix list locations
-nnoremap <leader>d :cdo s//g \| update<C-Left><C-Left><C-Left><Right><Right>
+nnoremap <leader>R :cdo s//g \| update<C-Left><C-Left><C-Left><Right><Right>
 
 " Open previous file
 nnoremap <leader>p <C-^>
@@ -181,6 +181,12 @@ nnoremap <leader>x <C-w>c
 
 " Keep only current window
 nnoremap <leader>z <C-w>o
+
+" Yank current file/folder path to clipboard
+nnoremap <leader>yy :let @+=expand('%')<cr> \| :echo "Copied path:"@+<cr>
+nnoremap <leader>yb :let @+=expand('%:t')<cr> \| :echo "Copied basename:"@+<cr>
+nnoremap <leader>yp :let @+=expand('%:p')<cr> \| :echo "Copied full path:"@+<cr>
+nnoremap <leader>yf :let @+=expand('%:p:h')<cr> \| :echo "Copied full folder path:"@+<cr>
 
 " XML pretty formatting
 if executable('xmllint')
@@ -345,7 +351,7 @@ inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
 
 " Indentline settings
 let g:indentLine_enabled = 0
-nnoremap <Leader>y :IndentLinesToggle<cr>
+nnoremap <Leader><TAB> :IndentLinesToggle<cr>
 
 " Docker Tools settings
 let g:dockertools_size = 10
