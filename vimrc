@@ -27,6 +27,8 @@ set statusline+=\
 set statusline+=%#PmenuSel#
 set statusline+=%{FugitiveStatusline()}
 set statusline+=%#LineNr#
+highlight StatusLineNC ctermfg=242
+highlight StatusLine ctermfg=240
 
 " Auto commands
 augroup etordera
@@ -34,7 +36,7 @@ augroup etordera
     " Tab sizes per file type
     autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript setlocal tabstop=2 shiftwidth=2
     " Keyword chars per file type
-    autocmd Filetype ruby setlocal iskeyword=@,48-57,_,?,!
+    autocmd Filetype ruby,haml setlocal iskeyword=@,48-57,_,?
 augroup END
 
 " Share default register with system clipboard
@@ -119,8 +121,20 @@ nnoremap <leader>w :w<cr>
 " Quick quit
 nnoremap <leader>q :qa<cr>
 
-" Close quickfix/local list
-nnoremap <leader>c :cclose<cr>:lclose<cr>
+" Close quickfix/local list, fugitive and terminal rspec windows
+function! CloseFugitiveWindow()
+    let fugitive_winnr = bufwinnr('/.git/index$')
+    if fugitive_winnr != -1
+        exe fugitive_winnr . "wincmd c"
+    endif
+endfunction
+function! CloseTerminalRspecWindow()
+    let rspec_winnr = bufwinnr('bundle exec rspec')
+    if rspec_winnr != -1
+        exe rspec_winnr . "wincmd c"
+    endif
+endfunction
+nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTerminalRspecWindow()<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
@@ -143,6 +157,10 @@ cnoremap w!! w !sudo tee % > /dev/null
 " Quickly edit and save .vimrc
 nnoremap <leader>ev :vsp $MYVIMRC<cr>
 nnoremap <leader>sv :w<cr>:source $MYVIMRC<cr>:q<cr>
+
+" Move up/down inside wrapped lines
+nnoremap j gj
+nnoremap k gk
 
 " Exit insert mode without <esc> stretch
 inoremap jk <esc>
@@ -185,8 +203,17 @@ nnoremap <leader>z <C-w>o
 " Yank current file/folder path to clipboard
 nnoremap <leader>yy :let @+=expand('%')<cr> \| :echo "Copied path:"@+<cr>
 nnoremap <leader>yb :let @+=expand('%:t')<cr> \| :echo "Copied basename:"@+<cr>
-nnoremap <leader>yp :let @+=expand('%:p')<cr> \| :echo "Copied full path:"@+<cr>
-nnoremap <leader>yf :let @+=expand('%:p:h')<cr> \| :echo "Copied full folder path:"@+<cr>
+nnoremap <leader>yf :let @+=expand('%:p')<cr> \| :echo "Copied full path:"@+<cr>
+
+" Open file from path in clipboard
+nnoremap <leader>yo :e <C-r>+<cr>
+
+" Toggle word wrapping
+nnoremap <leader>a :set wrap!<cr>
+
+" Move visually selected lines up and down
+vnoremap J :m '>+1<cr>gv=gv
+vnoremap K :m '<-2<cr>gv=gv
 
 " XML pretty formatting
 if executable('xmllint')
@@ -253,7 +280,7 @@ Plug 'easymotion/vim-easymotion'
 " Fuzzy file searches
 Plug 'ctrlpvim/ctrlp.vim'
 " Check syntax inside vim
-Plug 'vim-syntastic/syntastic'
+Plug 'dense-analysis/ale'
 " Running rspec
 Plug 'thoughtbot/vim-rspec'
 " Run rspecs in tmux pane, read errors to quickfix list
@@ -283,6 +310,10 @@ if has('nvim')
     Plug 'etordera/deoplete-rails'
 else
     Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+endif
+" Rubocop autocorrection
+if executable('rubocop')
+    Plug 'etordera/vim-rubocop-autocorrect'
 endif
 
 call plug#end()
@@ -334,14 +365,22 @@ nnoremap <Leader>sa :call RunAllSpecs()<cr>
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
 let g:UltiSnipsExpandTrigger = '<C-e>'
 
-" Syntastic settings
+" ALE settings
+let g:ale_linters = { 'ruby': ['ruby'] }
 if executable('rubocop')
-    function! SaveAndRubocop()
-        let g:syntastic_ruby_checkers = ['rubocop']
-        write
-        unlet g:syntastic_ruby_checkers
+    function! ToggleRubocop()
+        if has_key(g:ale_linters, 'ruby')
+            if g:ale_linters['ruby'] == ['ruby']
+                let g:ale_linters = { 'ruby': ['rubocop'] }
+            else
+                let g:ale_linters = { 'ruby': ['ruby'] }
+            endif
+        else
+            let g:ale_linters = { 'ruby': ['rubocop'] }
+        endif
+        ALELint
     endfunction
-    nnoremap <Leader>b :call SaveAndRubocop()<cr>
+    nnoremap <Leader>b :call ToggleRubocop()<cr>
 endif
 
 " Deoplete settings
