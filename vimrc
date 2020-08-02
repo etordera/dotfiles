@@ -144,9 +144,9 @@ vnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 nnoremap <leader>l :set hlsearch!<cr>
 
 " Create tags file: only project files
-nnoremap <leader>tp :!ctags -R --languages=ruby --exclude=.git --exclude=log .<cr>
+nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log .<cr>
 " Create tags file: project files and bundled gems
-nnoremap <leader>tb :!ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle show --paths \| grep ^/)<cr>
+nnoremap <leader>tb :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log . $(bundle show --paths \| grep ^/)<cr>
 " Jump to tag, open select window for multiple matches
 nnoremap <leader>tt g<C-]>
 vnoremap <leader>tt g<C-]>
@@ -212,8 +212,8 @@ nnoremap <leader>yo :e <C-r>+<cr>
 nnoremap <leader>a :set wrap!<cr>
 
 " Move visually selected lines up and down
-vnoremap J :m '>+1<cr>gv=gv
-vnoremap K :m '<-2<cr>gv=gv
+vnoremap J :m '>+1<cr>gv
+vnoremap K :m '<-2<cr>gv
 
 " XML pretty formatting
 if executable('xmllint')
@@ -331,8 +331,8 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp'
 set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
 let g:ctrlp_working_path_mode = 'a'
-" Add kinds for universal-ctags: S for singleton methods, s for scopes
-let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs' }
+" Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
+let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpv' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
 
@@ -356,9 +356,9 @@ call RotateRSpecCommand()
 
 nnoremap <Leader>sc :call RotateRSpecCommand()<cr>:call RSpecCommandInfo()<cr>
 nnoremap <Leader>si :call RSpecCommandInfo()<cr>
-nnoremap <Leader>sf :call RunCurrentSpecFile()<cr>
-nnoremap <Leader>ss :call RunNearestSpec()<cr>
-nnoremap <Leader>sl :call RunLastSpec()<cr>
+nnoremap <Leader>sf :call CloseTerminalRspecWindow()<cr>:call RunCurrentSpecFile()<cr>
+nnoremap <Leader>ss :call CloseTerminalRspecWindow()<cr>:call RunNearestSpec()<cr>
+nnoremap <Leader>sl :call CloseTerminalRspecWindow()<cr>:call RunLastSpec()<cr>
 nnoremap <Leader>sa :call RunAllSpecs()<cr>
 
 " UltiSnips settings
