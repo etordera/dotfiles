@@ -1,0 +1,38 @@
+" Searching
+set ignorecase    " Searches are case-insensitive
+set smartcase     " Search case-sensitively for terms with uppercase letters
+set incsearch     " Show search hits while typing
+set nohlsearch    " Do not highlight search hits
+
+" Ease things for spanish keyboard
+noremap ñ /
+noremap Ñ ?
+let mapleader = " "
+
+" Toggle highlighting search matches
+nnoremap <leader>l :set hlsearch!<cr>
+
+" Exit insert mode without <esc> stretch
+inoremap jk <esc>
+
+" Quicker begin and end of line
+nnoremap H 0
+vnoremap H 0
+nnoremap L $
+vnoremap L $
+
+" Sensible yank to end of line
+nnoremap Y y$
+
+" Swap 'jump to' markers.
+" Easier to type ' now jumps to line and column.
+nnoremap ' `
+nnoremap ` '
+
+
+" ------------------------------------------------------------------------------
+" Plugins
+" ------------------------------------------------------------------------------
+set surround
+set commentary
+set easymotion
