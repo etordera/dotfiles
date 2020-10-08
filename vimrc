@@ -144,7 +144,7 @@ vnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 nnoremap <leader>l :set hlsearch!<cr>
 
 " Create tags file: only project files
-nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log .<cr>
+nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log --exclude=node_modules .<cr>
 " Create tags file: project files and bundled gems
 nnoremap <leader>tb :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log . $(bundle show --paths \| grep ^/)<cr>
 " Jump to tag, open select window for multiple matches
@@ -222,7 +222,7 @@ endif
 
 " JSON pretty formatting
 if executable('python')
-    command! XJsonFmt execute '%!python -m json.tool'
+    command! XJsonPretty execute '%!python -m json.tool'
 endif
 
 " Hex dump
@@ -311,10 +311,14 @@ if has('nvim')
 else
     Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 endif
+" Dart syntax highlighting
+Plug 'dart-lang/dart-vim-plugin'
 " Rubocop autocorrection
 if executable('rubocop')
     Plug 'etordera/vim-rubocop-autocorrect'
 endif
+" nginx syntax highlighting
+Plug 'chr4/nginx.vim'
 
 call plug#end()
 
@@ -372,11 +376,14 @@ if executable('rubocop')
         if has_key(g:ale_linters, 'ruby')
             if g:ale_linters['ruby'] == ['ruby']
                 let g:ale_linters = { 'ruby': ['rubocop'] }
+                echo "RuboCop is now enabled"
             else
                 let g:ale_linters = { 'ruby': ['ruby'] }
+                echo "RuboCop is now disabled"
             endif
         else
             let g:ale_linters = { 'ruby': ['rubocop'] }
+            echo "RuboCop is now enabled"
         endif
         ALELint
     endfunction
@@ -394,7 +401,7 @@ nnoremap <Leader><TAB> :IndentLinesToggle<cr>
 
 " Docker Tools settings
 let g:dockertools_size = 10
-nnoremap <Leader>k :DockerToolsToggle<cr>
+" nnoremap <Leader>k :DockerToolsToggle<cr>
 
 " EasyMotion settings
 let g:EasyMotion_keys = 'asdfghjklqwertyuiopzxcvbnmñ'
