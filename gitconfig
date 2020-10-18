@@ -1,0 +1,5 @@
+[user]
+	name = Enric Tordera
+	email = etordera@tirant.com
+[alias]
+    local-branches = !git branch -vv | cut -c 3- | awk '$3 !~/\\[origin/ { print $1 }'
