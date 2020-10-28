@@ -3,3 +3,6 @@
 	email = etordera@tirant.com
 [alias]
     local-branches = !git branch -vv | cut -c 3- | awk '$3 !~/\\[origin/ { print $1 }'
+    gone-branches = !git branch -vv | cut -c 3- | grep \"\\[origin.*: gone\\]\" | awk '{ print $1 }'
+[fetch]
+	prune = true
