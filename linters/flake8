@@ -1,4 +1,2 @@
 [flake8]
-#E501 line too long
-#E302 expected 2 lines, found 1
-ignore = E501,E302
+max-line-length = 100

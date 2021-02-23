@@ -36,7 +36,9 @@ augroup etordera
     " Tab sizes per file type
     autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript setlocal tabstop=2 shiftwidth=2
     " Keyword chars per file type
-    autocmd Filetype ruby,haml setlocal iskeyword=@,48-57,_,?
+    autocmd Filetype ruby setlocal iskeyword+=?
+    autocmd Filetype haml setlocal iskeyword+=?,-
+    autocmd Filetype javascript,scss setlocal iskeyword+=-
 augroup END
 
 " Share default register with system clipboard
@@ -121,6 +123,9 @@ nnoremap <leader>w :w<cr>
 " Quick quit
 nnoremap <leader>q :qa<cr>
 
+" Delete trailing spaces
+nnoremap <leader>ds :s/\v\s+$//<cr>
+
 " Close quickfix/local list, fugitive and terminal rspec windows
 function! CloseFugitiveWindow()
     let fugitive_winnr = bufwinnr('/.git/index$')
@@ -141,7 +146,7 @@ nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 vnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 
 " Toggle highlighting search matches
-nnoremap <leader>l :set hlsearch!<cr>
+nnoremap <leader>ll :set hlsearch!<cr>
 
 " Create tags file: only project files
 nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log --exclude=node_modules .<cr>
@@ -308,8 +313,6 @@ if has('nvim')
     Plug 'etordera/deoplete-ruby'
     " Autocomplete source: rails
     Plug 'etordera/deoplete-rails'
-else
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 endif
 " Dart syntax highlighting
 Plug 'dart-lang/dart-vim-plugin'
@@ -389,6 +392,7 @@ if executable('rubocop')
     endfunction
     nnoremap <Leader>b :call ToggleRubocop()<cr>
 endif
+nnoremap <Leader>lt :ALEToggleBuffer<cr>
 
 " Deoplete settings
 let g:deoplete#enable_at_startup = 1
@@ -396,8 +400,12 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
 
 " Indentline settings
+function! ColorColumnToggle()
+    let newcolorcolumn = &colorcolumn == "" ? "100" : ""
+    let &colorcolumn = newcolorcolumn
+endfunction
 let g:indentLine_enabled = 0
-nnoremap <Leader><TAB> :IndentLinesToggle<cr>
+nnoremap <Leader><TAB> :IndentLinesToggle<cr>:call ColorColumnToggle()<cr>
 
 " Docker Tools settings
 let g:dockertools_size = 10

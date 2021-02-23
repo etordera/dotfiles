@@ -9,6 +9,9 @@
     },
     "extends": "eslint:recommended",
     "rules": {
-        "quotes": ["warn", "single"]
+        "indent": ["warn", 2],
+        "max-len": ["warn", { "code": 100 }],
+        "quotes": ["warn", "single"],
+        "semi": ["warn", "always"]
     }
 }
