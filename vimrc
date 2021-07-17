@@ -7,6 +7,7 @@ set ignorecase    " Searches are case-insensitive
 set smartcase     " Search case-sensitively for terms with uppercase letters
 set incsearch     " Show search hits while typing
 set nohlsearch    " Do not highlight search hits
+set inccommand=nosplit   " Highlight and preview replace for substitute command
 
 " Indentation and tabs
 set autoindent       " Copy indent from current line when starting a new line
@@ -34,7 +35,7 @@ highlight StatusLine ctermfg=240
 augroup etordera
     autocmd!
     " Tab sizes per file type
-    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript,vue setlocal tabstop=2 shiftwidth=2
     " Keyword chars per file type
     autocmd Filetype ruby setlocal iskeyword+=?
     autocmd Filetype haml setlocal iskeyword+=?,-
@@ -91,10 +92,12 @@ let mapleader = " "
 
 " Use the silver searcher for grepping
 if executable('ag')
-    set grepprg=ag\ --nogroup\ --nocolor\ --column\ --ignore\ tags
+    set grepprg=ag\ --vimgrep\ --ignore\ tags
     command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
     " Find references to symbol under cursor
     nnoremap <leader>f :AG <C-r><C-w><cr>
+    " Find all rspec 'tags' (describe, context and it) in current spec file
+    nnoremap <leader>st :AG "^\s+(describe\\|context\\|it)" %<cr>
 endif
 
 " Settings needed for keycodes to work in terminal vim
@@ -133,13 +136,17 @@ function! CloseFugitiveWindow()
         exe fugitive_winnr . "wincmd c"
     endif
 endfunction
-function! CloseTerminalRspecWindow()
-    let rspec_winnr = bufwinnr('bundle exec rspec')
+function! CloseTestWindow()
+    let rspec_winnr = bufwinnr('rspec')
+    if rspec_winnr != -1
+        exe rspec_winnr . "wincmd c"
+    endif
+    let rspec_winnr = bufwinnr('jest')
     if rspec_winnr != -1
         exe rspec_winnr . "wincmd c"
     endif
 endfunction
-nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTerminalRspecWindow()<cr>
+nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTestWindow()<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
@@ -286,8 +293,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'ctrlpvim/ctrlp.vim'
 " Check syntax inside vim
 Plug 'dense-analysis/ale'
-" Running rspec
-Plug 'thoughtbot/vim-rspec'
+" Running tests
+Plug 'vim-test/vim-test'
 " Run rspecs in tmux pane, read errors to quickfix list
 Plug 'tpope/vim-dispatch'
 " Custom text-objects
@@ -302,8 +309,6 @@ Plug 'bogado/file-line'
 Plug 'SirVer/ultisnips'
 " Show indentation lines
 Plug 'yggdroot/indentline'
-" Manage docker containers
-Plug 'etordera/vim-docker-tools'
 " Autocomplete
 if has('nvim')
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -335,38 +340,52 @@ let NERDTreeMouseMode = 2
 let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp'
 
 " Ctrl-P settings
-set wildignore+=*/bin/*,*tmp/*,*.class,*.zip,*.jpg,*.png
+set wildignore+=*/bin/*,*tmp/*,*node_modules/*,*.class,*.zip,*.jpg,*.png
 let g:ctrlp_map = '<leader>o'
+let g:ctrlp_max_files = 0
 let g:ctrlp_working_path_mode = 'a'
 " Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
 let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpv' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
 
-" vim-rspec settings
-function! RotateRSpecCommand()
-    let g:rspec_command = g:rspec_commands[g:rspec_command_next]." --format documentation {spec}"
-    let g:rspec_command_next = g:rspec_command_next + 1
-    if g:rspec_command_next >= len(g:rspec_commands)
-        let g:rspec_command_next = 0
+" vim-test settings
+function! InitTestCommands()
+    let config_file = '.vim_test_commands' 
+    if filereadable(config_file)
+        let g:test_commands = readfile(config_file)
+    else
+        let g:test_commands = ['vsplit | terminal', 'Dispatch -compiler=rspec',]
+    endif
+    let g:test_command_current = 0
+endfunction
+call InitTestCommands()
+
+function! RotateTestCommand()
+    let g:test_command_current = g:test_command_current + 1
+    if g:test_command_current >= len(g:test_commands)
+        let g:test_command_current = 0
     endif
 endfunction
 
-function! RSpecCommandInfo()
-    echo "RSpec command: ".g:rspec_command
+function! TestCommandInfo()
+    echo "Test command: ".g:test_commands[g:test_command_current]
 endfunction
 
-"let g:rspec_commands = ['!rspec', '!bundle exec rspec', 'Dispatch -compiler=rspec bundle exec rspec', 'vsplit | terminal bundle exec rspec', 'terminal bundle exec rspec']
-let g:rspec_commands = ['Dispatch -compiler=rspec bundle exec rspec', 'vsplit | terminal bundle exec rspec']
-let g:rspec_command_next = 0
-call RotateRSpecCommand()
+function! CustomTestStrategy(cmd)
+  execute g:test_commands[g:test_command_current] . ' ' . a:cmd
+endfunction
 
-nnoremap <Leader>sc :call RotateRSpecCommand()<cr>:call RSpecCommandInfo()<cr>
-nnoremap <Leader>si :call RSpecCommandInfo()<cr>
-nnoremap <Leader>sf :call CloseTerminalRspecWindow()<cr>:call RunCurrentSpecFile()<cr>
-nnoremap <Leader>ss :call CloseTerminalRspecWindow()<cr>:call RunNearestSpec()<cr>
-nnoremap <Leader>sl :call CloseTerminalRspecWindow()<cr>:call RunLastSpec()<cr>
-nnoremap <Leader>sa :call RunAllSpecs()<cr>
+let test#ruby#use_binstubs = 0
+let g:test#custom_strategies = {'custom': function('CustomTestStrategy')}
+let g:test#strategy = 'custom'
+
+nnoremap <Leader>sc :call RotateTestCommand()<cr>:call TestCommandInfo()<cr>
+nnoremap <Leader>si :call TestCommandInfo()<cr>
+nnoremap <Leader>sf :call CloseTestWindow()<cr>:TestFile<cr>
+nnoremap <Leader>ss :call CloseTestWindow()<cr>:TestNearest<cr>
+nnoremap <Leader>sl :call CloseTestWindow()<cr>:TestLast<cr>
+nnoremap <Leader>sa :call CloseTestWindow()<cr>:TestSuite<cr>
 
 " UltiSnips settings
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
@@ -375,6 +394,7 @@ let g:UltiSnipsExpandTrigger = '<C-e>'
 " ALE settings
 let g:ale_linters = { 'ruby': ['ruby'] }
 if executable('rubocop')
+    let g:ale_linters = { 'ruby': ['rubocop'] }
     function! ToggleRubocop()
         if has_key(g:ale_linters, 'ruby')
             if g:ale_linters['ruby'] == ['ruby']
@@ -407,9 +427,9 @@ endfunction
 let g:indentLine_enabled = 0
 nnoremap <Leader><TAB> :IndentLinesToggle<cr>:call ColorColumnToggle()<cr>
 
-" Docker Tools settings
-let g:dockertools_size = 10
-" nnoremap <Leader>k :DockerToolsToggle<cr>
-
 " EasyMotion settings
 let g:EasyMotion_keys = 'asdfghjklqwertyuiopzxcvbnmñ'
+
+" Fugitive -> Fold changes in Gclog
+nnoremap <leader>G :setlocal foldmethod=syntax<cr>
+
