@@ -35,7 +35,7 @@ highlight StatusLine ctermfg=240
 augroup etordera
     autocmd!
     " Tab sizes per file type
-    autocmd Filetype html,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript,vue setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype html,css,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript,vue,json setlocal tabstop=2 shiftwidth=2
     " Keyword chars per file type
     autocmd Filetype ruby setlocal iskeyword+=?
     autocmd Filetype haml setlocal iskeyword+=?,-
@@ -89,6 +89,7 @@ runtime macros/matchit.vim
 noremap ñ /
 noremap Ñ ?
 let mapleader = " "
+let maplocalleader = " "
 
 " Use the silver searcher for grepping
 if executable('ag')
@@ -141,12 +142,26 @@ function! CloseTestWindow()
     if rspec_winnr != -1
         exe rspec_winnr . "wincmd c"
     endif
-    let rspec_winnr = bufwinnr('jest')
-    if rspec_winnr != -1
-        exe rspec_winnr . "wincmd c"
+    let jest_winnr = bufwinnr('jest')
+    if jest_winnr != -1
+        exe jest_winnr . "wincmd c"
+    endif
+    let vue_winnr = bufwinnr('vue-cli-service test')
+    if vue_winnr != -1
+        exe vue_winnr . "wincmd c"
+    endif
+    let pytest_winnr = bufwinnr('pytest')
+    if pytest_winnr != -1
+        exe pytest_winnr . "wincmd c"
     endif
 endfunction
-nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTestWindow()<cr>
+function! CloseCheatShWindow()
+    let fugitive_winnr = bufwinnr('_cheat')
+    if fugitive_winnr != -1
+        exe fugitive_winnr . "wincmd c"
+    endif
+endfunction
+nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTestWindow()<cr>:call CloseCheatShWindow()<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
@@ -321,6 +336,8 @@ if has('nvim')
 endif
 " Dart syntax highlighting
 Plug 'dart-lang/dart-vim-plugin'
+" Vue syntax highlighting
+Plug 'leafOfTree/vim-vue-plugin'
 " Rubocop autocorrection
 if executable('rubocop')
     Plug 'etordera/vim-rubocop-autocorrect'
@@ -337,7 +354,7 @@ let NERDTreeAutoDeleteBuffer = 1
 let NERDTreeMouseMode = 2
 
 " vim-closetag settings
-let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp'
+let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp,*.vue'
 
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*node_modules/*,*.class,*.zip,*.jpg,*.png
@@ -345,7 +362,7 @@ let g:ctrlp_map = '<leader>o'
 let g:ctrlp_max_files = 0
 let g:ctrlp_working_path_mode = 'a'
 " Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
-let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpv' }
+let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpsv' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
 
@@ -373,12 +390,18 @@ function! TestCommandInfo()
 endfunction
 
 function! CustomTestStrategy(cmd)
-  execute g:test_commands[g:test_command_current] . ' ' . a:cmd
+    let l:command = g:test_commands[g:test_command_current]
+    let l:options = ''
+    if  l:command =~ '.*Dispatch.*'
+        let l:options = ' --no-color'
+    endif
+    execute l:command . ' ' . a:cmd . l:options
 endfunction
 
 let test#ruby#use_binstubs = 0
 let g:test#custom_strategies = {'custom': function('CustomTestStrategy')}
 let g:test#strategy = 'custom'
+let test#python#runner = 'pytest'
 
 nnoremap <Leader>sc :call RotateTestCommand()<cr>:call TestCommandInfo()<cr>
 nnoremap <Leader>si :call TestCommandInfo()<cr>
@@ -433,3 +456,29 @@ let g:EasyMotion_keys = 'asdfghjklqwertyuiopzxcvbnmñ'
 " Fugitive -> Fold changes in Gclog
 nnoremap <leader>G :setlocal foldmethod=syntax<cr>
 
+" vim-vue-plugin settings
+let g:vim_vue_plugin_config = { 
+      \'syntax': {
+      \   'template': ['html'],
+      \   'script': ['javascript'],
+      \   'style': ['css', 'scss', 'sass'],
+      \},
+      \'full_syntax': [],
+      \'initial_indent': [],
+      \'attribute': 0,
+      \'keyword': 1,
+      \'foldexpr': 0,
+      \'debug': 0,
+      \}
+
+function! OnChangeVueSyntax(syntax)
+  if a:syntax == 'html'
+    setlocal commentstring=<!--%s-->
+    setlocal comments=s:<!--,m:\ \ \ \ ,e:-->
+  elseif a:syntax =~ '\vsass|scss|css'
+    setlocal comments=s1:/*,mb:*,ex:*/ commentstring&
+  else
+    setlocal commentstring=//%s
+    setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
+  endif
+endfunction
