@@ -20,8 +20,8 @@ set backspace=indent,eol,start      " Sensible backspace behaviour
 set laststatus=2
 set statusline=%f%<\ %q%h%w%m%r
 set statusline+=%=
-"set statusline+=[%b\ 0x%B]
-"set statusline+=\ 
+set statusline+=[%b\ 0x%B]
+set statusline+=\ 
 set statusline+=%l/%L
 set statusline+=:%c
 set statusline+=\ 
@@ -35,7 +35,7 @@ highlight StatusLine ctermfg=240
 augroup etordera
     autocmd!
     " Tab sizes per file type
-    autocmd Filetype html,css,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript,vue,json setlocal tabstop=2 shiftwidth=2
+    autocmd Filetype html,css,scss,eruby,xml,yaml,eruby.yaml,ruby,haml,javascript,vue,json,gsp setlocal tabstop=2 shiftwidth=2
     " Keyword chars per file type
     autocmd Filetype ruby setlocal iskeyword+=?
     autocmd Filetype haml setlocal iskeyword+=?,-
@@ -64,6 +64,7 @@ set sidescrolloff=8    " Keep 8 columns off the edges when scrolling horizontall
 set pastetoggle=<F2>   " F2 toggles paste mode (paste without autoindent)
 set nrformats=bin,hex  " <C-a>, <C-x> don't mess with 0-padded numbers (octal)
 set diffopt=filler,vertical " Open diff windows with vertical split
+set nohidden           " Remove buffers when closing windows
 
 " Keep swap, backup and undo files out of workspaces
 if !has('nvim')
@@ -96,8 +97,6 @@ if executable('ag')
     set grepprg=ag\ --vimgrep\ --ignore\ tags
     command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
     " Find references to symbol under cursor
-    nnoremap <leader>f :AG <C-r><C-w><cr>
-    " Find all rspec 'tags' (describe, context and it) in current spec file
     nnoremap <leader>st :AG "^\s+(describe\\|context\\|it)" %<cr>
 endif
 
@@ -172,6 +171,8 @@ nnoremap <leader>ll :set hlsearch!<cr>
 
 " Create tags file: only project files
 nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log --exclude=node_modules .<cr>
+" Create tags file: groovy projects
+nnoremap <leader>tg :!ctags -R --languages=groovy,java,javascript --exclude=.git .<cr>
 " Create tags file: project files and bundled gems
 nnoremap <leader>tb :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log . $(bundle show --paths \| grep ^/)<cr>
 " Jump to tag, open select window for multiple matches
@@ -242,14 +243,18 @@ nnoremap <leader>a :set wrap!<cr>
 vnoremap J :m '>+1<cr>gv
 vnoremap K :m '<-2<cr>gv
 
+" Set and clear diff mode
+nnoremap <leader>dt :diffthis<cr>
+nnoremap <leader>do :diffoff!<cr>
+
 " XML pretty formatting
 if executable('xmllint')
     command! XXmlLint execute '%!xmllint --format -'
 endif
 
 " JSON pretty formatting
-if executable('python')
-    command! XJsonPretty execute '%!python -m json.tool'
+if executable('jq')
+    command! XJsonPretty execute '%!jq .'
 endif
 
 " Hex dump
@@ -260,6 +265,11 @@ endif
 " Quick open terminal in vertical split
 if has('nvim')
     command! T execute 'set shell=/bin/bash\ --login' | execute 'vsplit' | execute 'terminal' | execute 'set shell=/bin/bash'
+endif
+
+" Decode Base64 values
+if executable('decode64')
+    nnoremap <leader>v :let @+ = system('decode64 <C-r>=expand("<cWORD>")<cr>')<cr> \| :let @0=@+<cr> \| :echom @+<cr>
 endif
 
 
@@ -306,9 +316,11 @@ Plug 'scrooloose/nerdtree'
 Plug 'easymotion/vim-easymotion'
 " Fuzzy file searches
 Plug 'ctrlpvim/ctrlp.vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
 " Check syntax inside vim
 Plug 'dense-analysis/ale'
-" Running tests
+" Running tests/rspecs
 Plug 'vim-test/vim-test'
 " Run rspecs in tmux pane, read errors to quickfix list
 Plug 'tpope/vim-dispatch'
@@ -358,13 +370,18 @@ let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp,*.vue'
 
 " Ctrl-P settings
 set wildignore+=*/bin/*,*tmp/*,*node_modules/*,*.class,*.zip,*.jpg,*.png
-let g:ctrlp_map = '<leader>o'
 let g:ctrlp_max_files = 0
 let g:ctrlp_working_path_mode = 'a'
 " Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
-let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpsv' }
+let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpsv', 'groovy': '--groovy-types=fcuv' }
 nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
+
+" Telescope settings
+nnoremap <leader>o :lua require('telescope.builtin').find_files({previewer = false})<cr>
+nnoremap <leader>g :Telescope live_grep<cr>
+vnoremap <leader>g "zy<cmd>exec 'Telescope live_grep default_text=' . escape(@z, ' [?')<cr>
+nnoremap <leader>f :Telescope grep_string<cr>
 
 " vim-test settings
 function! InitTestCommands()
@@ -402,6 +419,7 @@ let test#ruby#use_binstubs = 0
 let g:test#custom_strategies = {'custom': function('CustomTestStrategy')}
 let g:test#strategy = 'custom'
 let test#python#runner = 'pytest'
+let g:test#javascript#jest#options = '--env jest-environment-jsdom-sixteen --config jest_config.json'
 
 nnoremap <Leader>sc :call RotateTestCommand()<cr>:call TestCommandInfo()<cr>
 nnoremap <Leader>si :call TestCommandInfo()<cr>
@@ -415,21 +433,18 @@ let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
 let g:UltiSnipsExpandTrigger = '<C-e>'
 
 " ALE settings
+let g:ale_virtualtext_cursor = 'disabled'
 let g:ale_linters = { 'ruby': ['ruby'] }
 if executable('rubocop')
     let g:ale_linters = { 'ruby': ['rubocop'] }
+    let g:ale_ruby_rubocop_executable = 'bundle'
     function! ToggleRubocop()
-        if has_key(g:ale_linters, 'ruby')
-            if g:ale_linters['ruby'] == ['ruby']
-                let g:ale_linters = { 'ruby': ['rubocop'] }
-                echo "RuboCop is now enabled"
-            else
-                let g:ale_linters = { 'ruby': ['ruby'] }
-                echo "RuboCop is now disabled"
-            endif
+        if g:ale_ruby_rubocop_executable == 'bundle'
+            let g:ale_ruby_rubocop_executable = 'rubocop'
+            echo "RuboCop executable is now just 'rubocop'"
         else
-            let g:ale_linters = { 'ruby': ['rubocop'] }
-            echo "RuboCop is now enabled"
+            let g:ale_ruby_rubocop_executable = 'bundle'
+            echo "RuboCop executable is now 'bundle exec rubocop'"
         endif
         ALELint
     endfunction
