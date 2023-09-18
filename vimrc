@@ -96,7 +96,7 @@ let maplocalleader = " "
 if executable('ag')
     set grepprg=ag\ --vimgrep\ --ignore\ tags
     command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
-    " Find references to symbol under cursor
+    " Find all rspec 'tags' (describe, context and it) in current spec file
     nnoremap <leader>st :AG "^\s+(describe\\|context\\|it)" %<cr>
 endif
 
