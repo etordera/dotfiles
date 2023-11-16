@@ -92,12 +92,10 @@ noremap Ñ ?
 let mapleader = " "
 let maplocalleader = " "
 
-" Use the silver searcher for grepping
-if executable('ag')
-    set grepprg=ag\ --vimgrep\ --ignore\ tags
-    command! -nargs=+ AG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
-    " Find all rspec 'tags' (describe, context and it) in current spec file
-    nnoremap <leader>st :AG "^\s+(describe\\|context\\|it)" %<cr>
+" Use ripgrep for grepping
+if executable('rg')
+    set grepprg=rg\ --vimgrep\ --smart-case
+    command! -nargs=+ -complete=file RG execute 'silent grep! '.<q-args> | execute 'redraw!' | execute 'copen'
 endif
 
 " Settings needed for keycodes to work in terminal vim
@@ -130,28 +128,18 @@ nnoremap <leader>q :qa<cr>
 nnoremap <leader>ds :s/\v\s+$//<cr>
 
 " Close quickfix/local list, fugitive and terminal rspec windows
+function! CloseTestWindow()
+    let l:blist = getbufinfo({'bufloaded': 1, 'buflisted': 1})
+    for l:item in l:blist
+        if match(l:item.name, 'phpunit\|rspec\|jest\|vue-cli-service test\|pytest') >= 0
+            execute "bdelete " . l:item.bufnr
+        endif
+    endfor
+endfunction
 function! CloseFugitiveWindow()
     let fugitive_winnr = bufwinnr('/.git/index$')
     if fugitive_winnr != -1
         exe fugitive_winnr . "wincmd c"
-    endif
-endfunction
-function! CloseTestWindow()
-    let rspec_winnr = bufwinnr('rspec')
-    if rspec_winnr != -1
-        exe rspec_winnr . "wincmd c"
-    endif
-    let jest_winnr = bufwinnr('jest')
-    if jest_winnr != -1
-        exe jest_winnr . "wincmd c"
-    endif
-    let vue_winnr = bufwinnr('vue-cli-service test')
-    if vue_winnr != -1
-        exe vue_winnr . "wincmd c"
-    endif
-    let pytest_winnr = bufwinnr('pytest')
-    if pytest_winnr != -1
-        exe pytest_winnr . "wincmd c"
     endif
 endfunction
 function! CloseCheatShWindow()
