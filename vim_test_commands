@@ -1,0 +1,2 @@
+vsplit | terminal docker-compose exec app
+Dispatch -compiler=rspec docker-compose exec app

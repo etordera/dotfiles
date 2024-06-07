@@ -1,0 +1,5 @@
+.DS_Store
+.rgignore
+.vim_test_commands
+.vim_rubocop_executable
+tags

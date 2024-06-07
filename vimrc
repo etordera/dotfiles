@@ -422,22 +422,13 @@ let g:UltiSnipsExpandTrigger = '<C-e>'
 
 " ALE settings
 let g:ale_virtualtext_cursor = 'disabled'
-let g:ale_linters = { 'ruby': ['ruby'] }
-if executable('rubocop')
-    let g:ale_linters = { 'ruby': ['rubocop'] }
-    let g:ale_ruby_rubocop_executable = 'bundle'
-    function! ToggleRubocop()
-        if g:ale_ruby_rubocop_executable == 'bundle'
-            let g:ale_ruby_rubocop_executable = 'rubocop'
-            echo "RuboCop executable is now just 'rubocop'"
-        else
-            let g:ale_ruby_rubocop_executable = 'bundle'
-            echo "RuboCop executable is now 'bundle exec rubocop'"
-        endif
-        ALELint
-    endfunction
-    nnoremap <Leader>b :call ToggleRubocop()<cr>
+
+let g:ale_linters = { 'ruby': ['rubocop'] }
+let rubocop_executable_file = './.vim_rubocop_executable' 
+if filereadable(rubocop_executable_file)
+    let g:ale_ruby_rubocop_executable = rubocop_executable_file
 endif
+
 nnoremap <Leader>lt :ALEToggleBuffer<cr>
 
 " Deoplete settings
