@@ -362,7 +362,6 @@ let g:ctrlp_max_files = 0
 let g:ctrlp_working_path_mode = 'a'
 " Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
 let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpsv', 'groovy': '--groovy-types=fcuv' }
-nnoremap <leader>r :CtrlPMRUFiles<cr>
 nnoremap <leader>m :CtrlPBufTag<cr>
 
 " Telescope settings
@@ -370,6 +369,7 @@ nnoremap <leader>o :lua require('telescope.builtin').find_files({previewer = fal
 nnoremap <leader>g :Telescope live_grep<cr>
 vnoremap <leader>g "zy<cmd>exec 'Telescope live_grep default_text=' . escape(@z, ' [?')<cr>
 nnoremap <leader>f :Telescope grep_string<cr>
+nnoremap <leader>r :lua require('telescope.builtin').oldfiles({previewer = false, only_cwd = true})<cr>
 
 " vim-test settings
 function! InitTestCommands()
