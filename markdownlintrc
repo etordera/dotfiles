@@ -1,5 +1,5 @@
 {
-  "line_length": {
-    "line_length": 100
-  }
+  "_comment": "https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md",
+  "line-length": { "line_length": 100 },
+  "ul-indent": { "indent": 4 }
 }
