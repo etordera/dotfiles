@@ -1,0 +1,5 @@
+!.gitlab-ci.yml
+!.vim_test_commands
+!.vim_rubocop_executable
+!config/application.yml
+!docker-compose.override.yml
