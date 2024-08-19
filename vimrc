@@ -11,10 +11,14 @@ set inccommand=nosplit   " Highlight and preview replace for substitute command
 
 " Indentation and tabs
 set autoindent       " Copy indent from current line when starting a new line
-set tabstop=4        " A <Tab> is four spaces
+set tabstop=4        " A <Tab> is 4 spaces
 set shiftwidth=4     " Indentation shift is 4 spaces
 set expandtab        " Use spaces instead of tabs
 set backspace=indent,eol,start      " Sensible backspace behaviour
+
+" Use old vim colorscheme instead of neovim 0.10 defaults
+colorscheme vim
+set notermguicolors
 
 " Custom status line
 set laststatus=2
@@ -40,6 +44,8 @@ augroup etordera
     autocmd Filetype ruby setlocal iskeyword+=?
     autocmd Filetype haml setlocal iskeyword+=?,-
     autocmd Filetype javascript,scss setlocal iskeyword+=-
+    " Disable deploete plugin automcompletion inside Telescope prompts
+    autocmd FileType TelescopePrompt call deoplete#custom#buffer_option('auto_complete', v:false)
 augroup END
 
 " Share default register with system clipboard
@@ -127,7 +133,7 @@ nnoremap <leader>q :qa<cr>
 " Delete trailing spaces
 nnoremap <leader>ds :s/\v\s+$//<cr>
 
-" Close quickfix/local list, fugitive and terminal rspec windows
+" Close quickfix/local list, fugitive and test windows
 function! CloseTestWindow()
     let l:blist = getbufinfo({'bufloaded': 1, 'buflisted': 1})
     for l:item in l:blist
@@ -142,13 +148,7 @@ function! CloseFugitiveWindow()
         exe fugitive_winnr . "wincmd c"
     endif
 endfunction
-function! CloseCheatShWindow()
-    let fugitive_winnr = bufwinnr('_cheat')
-    if fugitive_winnr != -1
-        exe fugitive_winnr . "wincmd c"
-    endif
-endfunction
-nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTestWindow()<cr>:call CloseCheatShWindow()<cr>
+nnoremap <leader>c :cclose<cr>:lclose<cr>:call CloseFugitiveWindow()<cr>:call CloseTestWindow()<cr>
 
 " Change ruby hashrockets to new format on current line
 nnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
@@ -158,7 +158,7 @@ vnoremap <leader>h :s/\v:([A-Za-z_0-9]+) ?\=\>/\1:/g<cr>
 nnoremap <leader>ll :set hlsearch!<cr>
 
 " Create tags file: only project files
-nnoremap <leader>tp :!ctags -R --languages=ruby,javascript --exclude=.git --exclude=log --exclude=node_modules .<cr>
+nnoremap <leader>tp :!ctags -R --languages=ruby,javascript,php --exclude=.git --exclude=log --exclude=node_modules .<cr>
 " Create tags file: groovy projects
 nnoremap <leader>tg :!ctags -R --languages=groovy,java,javascript --exclude=.git .<cr>
 " Create tags file: project files and bundled gems
@@ -303,7 +303,6 @@ Plug 'scrooloose/nerdtree'
 " Quick movements
 Plug 'easymotion/vim-easymotion'
 " Fuzzy file searches
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim', { 'branch': '0.1.x' }
 " Check syntax inside vim
@@ -356,20 +355,15 @@ let NERDTreeMouseMode = 2
 " vim-closetag settings
 let g:closetag_filenames = '*.html,*.htm,*.xml,*.erb,*.php,*.gsp,*.vue'
 
-" Ctrl-P settings
-set wildignore+=*/bin/*,*tmp/*,*node_modules/*,*.class,*.zip,*.jpg,*.png
-let g:ctrlp_max_files = 0
-let g:ctrlp_working_path_mode = 'a'
-" Add kinds for universal-ctags (ruby: S for singleton methods, s for scopes)
-let g:ctrlp_buftag_types = { 'ruby': '--ruby-types=cfFmSs', 'javascript': '--javascript-types=CGScfgmpsv', 'groovy': '--groovy-types=fcuv' }
-nnoremap <leader>m :CtrlPBufTag<cr>
-
 " Telescope settings
 nnoremap <leader>o :lua require('telescope.builtin').find_files({previewer = false})<cr>
 nnoremap <leader>g :Telescope live_grep<cr>
 vnoremap <leader>g "zy<cmd>exec 'Telescope live_grep default_text=' . escape(@z, ' [?')<cr>
 nnoremap <leader>f :Telescope grep_string<cr>
 nnoremap <leader>r :lua require('telescope.builtin').oldfiles({previewer = false, only_cwd = true})<cr>
+nnoremap <leader>m :Telescope current_buffer_tags only_sort_tags=true<cr>
+nnoremap <leader>T :Telescope resume<cr>
+nnoremap <leader>F :Telescope current_buffer_fuzzy_find<cr>
 
 " vim-test settings
 function! InitTestCommands()
@@ -407,7 +401,6 @@ let test#ruby#use_binstubs = 0
 let g:test#custom_strategies = {'custom': function('CustomTestStrategy')}
 let g:test#strategy = 'custom'
 let test#python#runner = 'pytest'
-let g:test#javascript#jest#options = '--env jest-environment-jsdom-sixteen --config jest_config.json'
 
 nnoremap <Leader>sc :call RotateTestCommand()<cr>:call TestCommandInfo()<cr>
 nnoremap <Leader>si :call TestCommandInfo()<cr>
@@ -422,13 +415,11 @@ let g:UltiSnipsExpandTrigger = '<C-e>'
 
 " ALE settings
 let g:ale_virtualtext_cursor = 'disabled'
-
 let g:ale_linters = { 'ruby': ['rubocop'] }
 let rubocop_executable_file = './.vim_rubocop_executable' 
 if filereadable(rubocop_executable_file)
     let g:ale_ruby_rubocop_executable = rubocop_executable_file
 endif
-
 nnoremap <Leader>lt :ALEToggleBuffer<cr>
 
 " Deoplete settings
