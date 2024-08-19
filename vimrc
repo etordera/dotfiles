@@ -44,7 +44,7 @@ augroup etordera
     autocmd Filetype ruby setlocal iskeyword+=?
     autocmd Filetype haml setlocal iskeyword+=?,-
     autocmd Filetype javascript,scss setlocal iskeyword+=-
-    " Disable deploete plugin automcompletion inside Telescope prompts
+    " Disable deoplete plugin autocompletion inside Telescope prompts
     autocmd FileType TelescopePrompt call deoplete#custom#buffer_option('auto_complete', v:false)
 augroup END
 
@@ -332,6 +332,8 @@ if has('nvim')
     Plug 'etordera/deoplete-ruby'
     " Autocomplete source: rails
     Plug 'etordera/deoplete-rails'
+    " Autocomplete source: rspec
+    Plug 'etordera/deoplete-rspec'
 endif
 " Dart syntax highlighting
 Plug 'dart-lang/dart-vim-plugin'
