@@ -240,6 +240,11 @@ if executable('xmllint')
     command! XXmlLint execute '%!xmllint --format -'
 endif
 
+" HTML pretty formatting
+if executable('tidy')
+    command! XHtmlFormat execute '%!tidy -quiet -indent --wrap 100 --tidy-mark no --drop-empty-elements no --show-warnings no'
+endif
+
 " JSON pretty formatting
 if executable('jq')
     command! XJsonPretty execute '%!jq .'
