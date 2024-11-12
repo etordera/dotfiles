@@ -2,4 +2,5 @@
 .rgignore
 .vim_test_commands
 .vim_rubocop_executable
+config/projections.json
 tags
