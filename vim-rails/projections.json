@@ -1,0 +1,8 @@
+{
+  "app/controllers/*_controller.rb": {
+    "test": [
+      "spec/requests/{}_controller_spec.rb",
+      "spec/controllers/{}_controller_spec.rb"
+    ]
+  }
+}
