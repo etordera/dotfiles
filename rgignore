@@ -1,5 +1,11 @@
+!.env.development
+!.env.development.local
+!.env.test
+!.env.test.local
+!.gitignore
 !.gitlab-ci.yml
 !.vim_test_commands
 !.vim_rubocop_executable
-!config/application.yml
+!application.yml
+!projections.json
 !docker-compose.override.yml
