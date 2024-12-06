@@ -4,8 +4,10 @@
 !.env.test.local
 !.gitignore
 !.gitlab-ci.yml
+!.rubocop.yml
 !.vim_test_commands
 !.vim_rubocop_executable
+!.s2i/
 !application.yml
 !projections.json
 !docker-compose.override.yml
