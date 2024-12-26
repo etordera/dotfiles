@@ -1,7 +1,9 @@
+!.env
 !.env.development
 !.env.development.local
 !.env.test
 !.env.test.local
+!.eslintrc.json
 !.gitignore
 !.gitlab-ci.yml
 !.rubocop.yml
