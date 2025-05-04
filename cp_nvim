@@ -1,0 +1,9 @@
+#!/bin/bash
+
+mkdir -p config/nvim
+rsync -a \
+    --exclude 'init.vim.backup' \
+    --exclude 'lazy-lock.json' \
+    --exclude 'lua/plugins/local_settings.lua' \
+    ~/.config/nvim/ \
+    config/nvim/
