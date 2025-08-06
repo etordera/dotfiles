@@ -33,6 +33,9 @@ vim.api.nvim_set_keymap('n', '<leader>ds', ':s/\\v\\s+$//<CR>', { noremap = true
 vim.api.nvim_set_keymap('n', '<leader>h', ':s/\\v:([A-Za-z_0-9]+) ?\\=\\>/\\1:/g<CR>', { noremap = true })
 vim.api.nvim_set_keymap('v', '<leader>h', ':s/\\v:([A-Za-z_0-9]+) ?\\=\\>/\\1:/g<CR>', { noremap = true })
 
+-- Add frozen_string_literal on top of file
+vim.api.nvim_set_keymap('n', '<leader>F', 'ggO# frozen_string_literal:true<CR><ESC>cc<ESC>', { noremap = true })
+
 -- Toggle highlighting search matches
 vim.api.nvim_set_keymap('n', '<leader>ll', ':set hlsearch!<CR>', { noremap = true })
 

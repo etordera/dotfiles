@@ -1,3 +1,3 @@
 return {
-  'bogado/file-line'
+  'bogado/file-line',
 }

@@ -33,6 +33,10 @@ vim.opt.nrformats = { 'bin', 'hex' }       -- <C-a>, <C-x> don't mess with 0-pad
 vim.opt.diffopt = { 'filler', 'vertical' } -- Open diff windows with vertical split
 
 -- Diagnostics
-vim.diagnostic.config({
-  virtual_text = true
-})
+-- vim.diagnostic.config({
+--   virtual_text = true
+-- })
+
+
+-- Load matchit (match do ... end)
+vim.cmd('runtime macros/matchit.vim')
