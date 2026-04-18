@@ -1,8 +1,9 @@
 return {
   'nvim-treesitter/nvim-treesitter-textobjects',
+  branch = 'main',
   dependencies = { 'nvim-treesitter/nvim-treesitter' },
   config = function ()
-    local configs = require("nvim-treesitter.configs")
+    local configs = require("nvim-treesitter")
 
     configs.setup({
       textobjects = {

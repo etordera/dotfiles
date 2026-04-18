@@ -40,3 +40,15 @@ vim.opt.diffopt = { 'filler', 'vertical' } -- Open diff windows with vertical sp
 
 -- Load matchit (match do ... end)
 vim.cmd('runtime macros/matchit.vim')
+
+-- Automatically read files when they've been changed outside of Vim
+vim.opt.autoread = true
+vim.opt.updatetime = 500
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  command = "checktime",
+  pattern = { "*" },
+})
+vim.api.nvim_create_autocmd({ "FileChangedShellPost" }, {
+  pattern = { "*" },
+  command = "echohl WarningMsg | echo 'File changed on disk. Buffer reloaded.' | echohl None",
+})

@@ -4,11 +4,13 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-treesitter/nvim-treesitter",
+    "ravitemer/codecompanion-history.nvim",
   },
   opts = {
     strategies = {
       chat = {
         adapter = "copilot",
+        model = "gemini-2.5-pro"
       },
       inline = {
         adapter = "copilot",
@@ -38,8 +40,24 @@ return {
             -- MCP Prompts 
             make_slash_commands = true,      -- Add MCP prompts as /slash commands
           }
-        }
-      }
+        },
+        history = {
+          enabled = true,
+          opts = {
+            expiration_days = 180,
+            title_generation_opts = {
+              adapter = "copilot",
+              model = "gpt-4o",
+            },
+            summary = {
+              generation_opts = {
+                adapter = "copilot",
+                model = "gpt-4o",
+              },
+            },
+          }
+        },
+      },
     })
   end,
 }

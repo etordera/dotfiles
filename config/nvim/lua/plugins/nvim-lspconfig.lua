@@ -12,13 +12,11 @@ return {
     },
   },
   config = function()
-    local lspconfig = require('lspconfig')
-
-    lspconfig.lua_ls.setup({})
-    lspconfig.pyright.setup({
+    vim.lsp.config('lua_ls',{})
+    vim.lsp.config('pyright',{
       cmd = { 'lsp-server-wrapper.rb' },
     })
-    lspconfig.ruby_lsp.setup({})
+    -- vim.lsp.config('ruby_lsp', {})
 
     vim.keymap.set('n', '<leader>ld', function()
       vim.diagnostic.open_float()

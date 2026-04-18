@@ -30,3 +30,8 @@ vim.api.nvim_create_user_command('T', function()
   vim.cmd('vsplit | terminal')
   vim.o.shell = '/bin/bash'
 end, {})
+
+-- git checkout custom command
+if vim.fn.executable('gco') == 1 then
+  vim.api.nvim_create_user_command('Gco', 'silent! !gco', {})
+end

@@ -1,30 +1,14 @@
 -- Ease things for Spanish keyboard
-vim.api.nvim_set_keymap('n', 'ñ', '/', { noremap = true })
-vim.api.nvim_set_keymap('n', 'Ñ', '?', { noremap = true })
+vim.keymap.set('n', 'ñ', '/', { noremap = true })
+vim.keymap.set('n', 'Ñ', '?', { noremap = true })
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
--- Settings needed for keycodes to work in terminal vim
-vim.api.nvim_set_var('<S-F3>', '\x1b[1;2R')
-vim.api.nvim_set_var('<S-F4>', '\x1b[1;2S')
-
--- Move to next/previous quickfix location
-vim.api.nvim_set_keymap('n', '<F3>', ':cnext<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<S-F3>', ':cprevious<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<F4>', ':cnfile<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<S-F4>', ':cpfile<CR>', { noremap = true })
-
--- Do a search and replace on quickfix list locations
-vim.api.nvim_set_keymap('n', '<leader>R', ':cdo s//g | update<C-Left><C-Left><C-Left><Right><Right>', { noremap = true })
 
 -- Open previous file
 vim.api.nvim_set_keymap('n', '<leader>p', '<C-^>', { noremap = true })
 
 -- Quick save
 vim.api.nvim_set_keymap('n', '<leader>w', ':w<CR>', { noremap = true })
-
--- Quick quit
-vim.api.nvim_set_keymap('n', '<leader>q', ':qa<CR>', { noremap = true })
 
 -- Delete trailing spaces
 vim.api.nvim_set_keymap('n', '<leader>ds', ':s/\\v\\s+$//<CR>', { noremap = true })
@@ -36,28 +20,9 @@ vim.api.nvim_set_keymap('v', '<leader>h', ':s/\\v:([A-Za-z_0-9]+) ?\\=\\>/\\1:/g
 -- Add frozen_string_literal on top of file
 vim.api.nvim_set_keymap('n', '<leader>F', 'ggO# frozen_string_literal:true<CR><ESC>cc<ESC>', { noremap = true })
 
--- Toggle highlighting search matches
-vim.api.nvim_set_keymap('n', '<leader>ll', ':set hlsearch!<CR>', { noremap = true })
-
--- Create tags file: only project files
-vim.api.nvim_set_keymap('n', '<leader>tp', ':!ctags -R --languages=ruby,javascript,php --exclude=.git --exclude=log --exclude=node_modules --exclude=public --exclude=vendor .<CR>', { noremap = true })
-
--- Create tags file: project files and vendor/bundle
-vim.api.nvim_set_keymap('n', '<leader>tb', ':!ctags -R --languages=ruby,javascript,php --exclude=.git --exclude=log --exclude=node_modules --exclude=public .<CR>', { noremap = true })
-
--- Create tags file: groovy projects
-vim.api.nvim_set_keymap('n', '<leader>tg', ':!ctags -R --languages=groovy,java,javascript --exclude=.git .<CR>', { noremap = true })
-
 -- Jump to tag, open select window for multiple matches
 vim.api.nvim_set_keymap('n', '<leader>tt', 'g<C-]>', { noremap = true })
 vim.api.nvim_set_keymap('v', '<leader>tt', 'g<C-]>', { noremap = true })
-
--- Write with sudo
-vim.api.nvim_set_keymap('c', 'w!!', 'w !sudo tee % > /dev/null', { noremap = true })
-
--- Quickly edit and save .vimrc
-vim.api.nvim_set_keymap('n', '<leader>ev', ':vsp $MYVIMRC<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>sv', ':w<CR>:source $MYVIMRC<CR>:q<CR>', { noremap = true })
 
 -- Move up/down inside wrapped lines
 vim.api.nvim_set_keymap('n', 'j', 'gj', { noremap = true })
@@ -65,7 +30,6 @@ vim.api.nvim_set_keymap('n', 'k', 'gk', { noremap = true })
 
 -- Exit insert mode without <esc> stretch
 vim.api.nvim_set_keymap('i', 'jk', '<esc>', { noremap = true })
-vim.api.nvim_set_keymap('t', 'jk', '<C-\\><C-n>', { noremap = true })
 
 -- Quicker begin and end of line
 vim.keymap.set('n', 'H', '0', { noremap = true })
@@ -120,27 +84,3 @@ vim.keymap.set('n', '<leader>yo', ':e <C-r>+<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>a', function()
     vim.wo.wrap = not vim.wo.wrap
 end, { noremap = true })
-
--- Move visually selected lines up and down
-vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { noremap = true })
-vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { noremap = true })
-
--- Set and clear diff mode
-vim.keymap.set('n', '<leader>dt', ':diffthis<CR>', { noremap = true })
-vim.keymap.set('n', '<leader>do', ':diffoff!<CR>', { noremap = true })
-
--- Sort and get unique values from spreadsheet copied data
-vim.keymap.set('n', '<leader>su', [[ggVG:s/\s\+/\r/g<CR>:g/^$/d<CR>VG<Esc>ggVG:sort u<CR>]], { noremap = true })
-
--- Sort and get count of values from spreadsheet copied data
-vim.keymap.set('n', '<leader>suc', [[ggVG:s/\s\+/\r/g<CR>:g/^$/d<CR>VG<Esc>ggVG:sort<CR>VG:!uniq -c \| sort -r<CR>]], { noremap = true })
-
--- Decode Base64 values
-if vim.fn.executable('decode64') == 1 then
-    vim.keymap.set('n', '<leader>v', function()
-        local word = vim.fn.expand('<cWORD>')
-        vim.fn.setreg('+', vim.fn.system('decode64 ' .. word))
-        vim.fn.setreg('0', vim.fn.getreg('+'))
-        print(vim.fn.getreg('+'))
-    end, { noremap = true })
-end

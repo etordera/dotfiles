@@ -1,0 +1,5 @@
+print("VSCode Neovim config loading started...")
+require("settings")
+require("filetypes")
+require("keymaps_vscode")
+print("VSCode Neovim config loaded!")

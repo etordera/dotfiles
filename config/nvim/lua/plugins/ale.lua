@@ -5,6 +5,8 @@ return {
     vim.g.ale_virtualtext_cursor = 'disabled'
     vim.g.ale_linters = { ruby = { 'rubocop' } }
 
+    vim.g.ale_javascript_eslint_options = '--no-warn-ignored'
+
     local rubocop_executable_file = './.vim_rubocop_executable'
     if vim.fn.filereadable(rubocop_executable_file) == 1 then
       vim.g.ale_ruby_rubocop_executable = rubocop_executable_file
