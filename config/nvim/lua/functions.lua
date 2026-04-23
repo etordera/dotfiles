@@ -17,7 +17,7 @@ function Close_auxiliar_windows()
       local buf_name = vim.api.nvim_buf_get_name(buf)
       for _, pattern in ipairs(test_patterns) do
         if string.find(buf_name, pattern) then
-          vim.cmd("close " .. win)
+          vim.api.nvim_win_close(win, true)
         end
       end
     end
